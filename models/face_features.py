@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from .mobilefacenet import MobileFaceNet
-
+import torch.nn as nn
 
 class FaceFeatures(object):
     def __init__(self, weights_path, device):
