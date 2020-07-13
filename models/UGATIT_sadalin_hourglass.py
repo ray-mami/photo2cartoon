@@ -143,10 +143,10 @@ class UgatitSadalinHourglass(object):
         """ Define Loss """
         #self.L1_loss = nn.L1Loss().cuda()
         #self.MSE_loss = nn.MSELoss().cuda()
-        #self.BCE_loss = nn.BCEWithLogitsLoss().cuda()
+        #
         self.L1_loss = nn.DataParallel(nn.L1Loss().cuda())
         self.MSE_loss = nn.DataParallel(nn.MSELoss().cuda())
-        self.MSE_loss = nn.DataParallel(nn.MSELoss().cuda())
+        self.BCE_loss = nn.DataParallel(nn.BCEWithLogitsLoss().cuda())
 
         """ Trainer """
         self.G_optim = torch.optim.Adam(itertools.chain(self.genA2B.parameters(), self.genB2A.parameters()), lr=self.lr, betas=(0.5, 0.999), weight_decay=0.0001)
