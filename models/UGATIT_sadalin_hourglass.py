@@ -106,30 +106,30 @@ class UgatitSadalinHourglass(object):
         """ Define Generator, Discriminator """
 
         self.genA2B = ResnetGenerator(ngf=self.ch, img_size=self.img_size, light=self.light)
-        self.genA2B = nn.DataParallel(self.genA2B，device_ids=[0,1,2,3])
+        self.genA2B = nn.DataParallel(self.genA2B, device_ids=[0,1,2,3])
         self.genA2B.to(self.device)
 
 
-        self.genB2A = ResnetGenerator(ngf=self.ch, img_size=self.img_size, light=self.light).to(self.device)
-        self.genB2A = nn.DataParallel(self.genB2A，device_ids=[0,1,2,3])
-        self.genA2B.to(self.device)
+        self.genB2A = ResnetGenerator(ngf=self.ch, img_size=self.img_size, light=self.light)
+        self.genB2A = nn.DataParallel(self.genB2A, device_ids=[0,1,2,3])
+        self.genB2A.to(self.device)
 
 
         self.disGA = Discriminator(input_nc=3, ndf=self.ch, n_layers=7).to(self.device)
-        self.disGA = nn.DataParallel(self.disGA，device_ids=[0,1,2,3])
-        self.genA2B.to(self.device)
+        self.disGA = nn.DataParallel(self.disGA, device_ids=[0,1,2,3])
+        self.disGA.to(self.device)
 
         self.disGB = Discriminator(input_nc=3, ndf=self.ch, n_layers=7).to(self.device)
-        self.disGB = nn.DataParallel(self.disGB，device_ids=[0,1,2,3])
+        self.disGB = nn.DataParallel(self.disGB, device_ids=[0,1,2,3])
         self.disGB.to(self.device)
 
         self.disLA = Discriminator(input_nc=3, ndf=self.ch, n_layers=5).to(self.device)
-        self.disLA = nn.DataParallel(self.disLA，device_ids=[0,1,2,3])
+        self.disLA = nn.DataParallel(self.disLA, device_ids=[0,1,2,3])
         self.disLA.to(self.device)
 
 
         self.disLB = Discriminator(input_nc=3, ndf=self.ch, n_layers=5).to(self.device)
-        self.disLB = nn.DataParallel(self.disLB，device_ids=[0,1,2,3])
+        self.disLB = nn.DataParallel(self.disLB, device_ids=[0,1,2,3])
         self.disLB.to(self.device)
 
         self.facenet = FaceFeatures('models/model_mobilefacenet.pth', self.device)
