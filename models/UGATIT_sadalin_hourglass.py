@@ -106,38 +106,47 @@ class UgatitSadalinHourglass(object):
         """ Define Generator, Discriminator """
 
         self.genA2B = ResnetGenerator(ngf=self.ch, img_size=self.img_size, light=self.light)
-        self.genA2B = nn.DataParallel(self.genA2B, device_ids=[0,1,2,3])
-        self.genA2B.to(self.device)
+        self.genA2B.cuda()
+        self.genA2B = nn.DataParallel(self.genA2B)
+        
 
 
         self.genB2A = ResnetGenerator(ngf=self.ch, img_size=self.img_size, light=self.light)
-        self.genB2A = nn.DataParallel(self.genB2A, device_ids=[0,1,2,3])
-        self.genB2A.to(self.device)
+        self.genB2A.cuda()
+        self.genB2A = nn.DataParallel(self.genB2A)
+        
 
 
-        self.disGA = Discriminator(input_nc=3, ndf=self.ch, n_layers=7).to(self.device)
-        self.disGA = nn.DataParallel(self.disGA, device_ids=[0,1,2,3])
-        self.disGA.to(self.device)
+        self.disGA = Discriminator(input_nc=3, ndf=self.ch, n_layers=7)
+        self.disGA.cuda()
+        self.disGA = nn.DataParallel(self.disGA)
+        
 
-        self.disGB = Discriminator(input_nc=3, ndf=self.ch, n_layers=7).to(self.device)
-        self.disGB = nn.DataParallel(self.disGB, device_ids=[0,1,2,3])
-        self.disGB.to(self.device)
+        self.disGB = Discriminator(input_nc=3, ndf=self.ch, n_layers=7)
+        self.disGB.cuda()
+        self.disGB = nn.DataParallel(self.disGB)
+        
 
-        self.disLA = Discriminator(input_nc=3, ndf=self.ch, n_layers=5).to(self.device)
-        self.disLA = nn.DataParallel(self.disLA, device_ids=[0,1,2,3])
-        self.disLA.to(self.device)
+        self.disLA = Discriminator(input_nc=3, ndf=self.ch, n_layers=5)
+        self.disLA.cuda()
+        self.disLA = nn.DataParallel(self.disLA)
+        
 
 
-        self.disLB = Discriminator(input_nc=3, ndf=self.ch, n_layers=5).to(self.device)
-        self.disLB = nn.DataParallel(self.disLB, device_ids=[0,1,2,3])
-        self.disLB.to(self.device)
+        self.disLB = Discriminator(input_nc=3, ndf=self.ch, n_layers=5)
+        self.disLB.cuda()
+        self.disLB = nn.DataParallel(self.disLB)
+        
 
         self.facenet = FaceFeatures('models/model_mobilefacenet.pth', self.device)
 
         """ Define Loss """
-        self.L1_loss = nn.L1Loss().to(self.device)
-        self.MSE_loss = nn.MSELoss().to(self.device)
-        self.BCE_loss = nn.BCEWithLogitsLoss().to(self.device)
+        #self.L1_loss = nn.L1Loss().to(self.device)
+        #self.MSE_loss = nn.MSELoss().to(self.device)
+        #self.BCE_loss = nn.BCEWithLogitsLoss().to(self.device)
+        self.L1_loss = nn.DataParallel(nn.L1Loss().cuda())
+        self.MSE_loss = nn.DataParallel(nn.MSELoss().cuda())
+        self.MSE_loss = nn.DataParallel(nn.MSELoss().cuda())
 
         """ Trainer """
         self.G_optim = torch.optim.Adam(itertools.chain(self.genA2B.parameters(), self.genB2A.parameters()), lr=self.lr, betas=(0.5, 0.999), weight_decay=0.0001)
