@@ -6,7 +6,9 @@ from .mobilefacenet import MobileFaceNet
 class FaceFeatures(object):
     def __init__(self, weights_path, device):
         self.device = device
-        self.model = MobileFaceNet(512).to(device)
+        self.model = MobileFaceNet(512)
+        self.model = nn.DataParallel(self.model, device_ids=[0,1,2,3])
+        self.model.to(device)
         self.model.load_state_dict(torch.load(weights_path))
         self.model.eval()
 

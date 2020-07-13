@@ -4,6 +4,10 @@ import shutil
 from utils import *
 
 
+os.environ['CUDA_DEVICE_ORDRE'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+
+
 def parse_args():
     """parsing and configuration"""
     desc = "photo2cartoon"
