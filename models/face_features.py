@@ -8,8 +8,8 @@ class FaceFeatures(object):
         self.device = device
         self.model = MobileFaceNet(512)
         self.model.load_state_dict(torch.load(weights_path))
-        self.model.cuda()
-        self.model = nn.DataParallel(self.model)
+        self.model.to(self.device)
+        #self.model = nn.DataParallel(self.model)
         
         self.model.eval()
 

@@ -141,12 +141,12 @@ class UgatitSadalinHourglass(object):
         self.facenet = FaceFeatures('models/model_mobilefacenet.pth', self.device)
 
         """ Define Loss """
-        #self.L1_loss = nn.L1Loss().cuda()
-        #self.MSE_loss = nn.MSELoss().cuda()
+        #self.L1_loss = nn.L1Loss().to(self.device)
+        #self.MSE_loss = nn.MSELoss().to(self.device)
         #
-        self.L1_loss = nn.DataParallel(nn.L1Loss().cuda())
-        self.MSE_loss = nn.DataParallel(nn.MSELoss().cuda())
-        self.BCE_loss = nn.DataParallel(nn.BCEWithLogitsLoss().cuda())
+        self.L1_loss = nn.L1Loss().to(self.device)
+        self.MSE_loss = nn.MSELoss().to(self.device)
+        self.BCE_loss = nn.BCEWithLogitsLoss().to(self.device)
 
         """ Trainer """
         self.G_optim = torch.optim.Adam(itertools.chain(self.genA2B.parameters(), self.genB2A.parameters()), lr=self.lr, betas=(0.5, 0.999), weight_decay=0.0001)
@@ -204,7 +204,7 @@ class UgatitSadalinHourglass(object):
                 trainB_iter = iter(self.trainB_loader)
                 real_B, _ = trainB_iter.next()
 
-            real_A, real_B = real_A.cuda(), real_B.cuda()
+            real_A, real_B = real_A.to(self.device), real_B.to(self.device)
 
             # Update D
             self.D_optim.zero_grad()
@@ -222,29 +222,29 @@ class UgatitSadalinHourglass(object):
             fake_GB_logit, fake_GB_cam_logit, _ = self.disGB(fake_A2B)
             fake_LB_logit, fake_LB_cam_logit, _ = self.disLB(fake_A2B)
 
-            D_ad_loss_GA = self.MSE_loss(real_GA_logit, torch.ones_like(real_GA_logit).cuda()) + \
-                           self.MSE_loss(fake_GA_logit, torch.zeros_like(fake_GA_logit).cuda())
+            D_ad_loss_GA = self.MSE_loss(real_GA_logit, torch.ones_like(real_GA_logit).to(self.device)) + \
+                           self.MSE_loss(fake_GA_logit, torch.zeros_like(fake_GA_logit).to(self.device))
 
-            D_ad_cam_loss_GA = self.MSE_loss(real_GA_cam_logit, torch.ones_like(real_GA_cam_logit).cuda()) + \
-                               self.MSE_loss(fake_GA_cam_logit, torch.zeros_like(fake_GA_cam_logit).cuda())
+            D_ad_cam_loss_GA = self.MSE_loss(real_GA_cam_logit, torch.ones_like(real_GA_cam_logit).to(self.device)) + \
+                               self.MSE_loss(fake_GA_cam_logit, torch.zeros_like(fake_GA_cam_logit).to(self.device))
 
-            D_ad_loss_LA = self.MSE_loss(real_LA_logit, torch.ones_like(real_LA_logit).cuda()) + \
-                           self.MSE_loss(fake_LA_logit, torch.zeros_like(fake_LA_logit).cuda())
+            D_ad_loss_LA = self.MSE_loss(real_LA_logit, torch.ones_like(real_LA_logit).to(self.device)) + \
+                           self.MSE_loss(fake_LA_logit, torch.zeros_like(fake_LA_logit).to(self.device))
 
-            D_ad_cam_loss_LA = self.MSE_loss(real_LA_cam_logit, torch.ones_like(real_LA_cam_logit).cuda()) +\
-                               self.MSE_loss(fake_LA_cam_logit, torch.zeros_like(fake_LA_cam_logit).cuda())
+            D_ad_cam_loss_LA = self.MSE_loss(real_LA_cam_logit, torch.ones_like(real_LA_cam_logit).to(self.device)) +\
+                               self.MSE_loss(fake_LA_cam_logit, torch.zeros_like(fake_LA_cam_logit).to(self.device))
 
-            D_ad_loss_GB = self.MSE_loss(real_GB_logit, torch.ones_like(real_GB_logit).cuda()) + \
-                           self.MSE_loss(fake_GB_logit, torch.zeros_like(fake_GB_logit).cuda())
+            D_ad_loss_GB = self.MSE_loss(real_GB_logit, torch.ones_like(real_GB_logit).to(self.device)) + \
+                           self.MSE_loss(fake_GB_logit, torch.zeros_like(fake_GB_logit).to(self.device))
 
-            D_ad_cam_loss_GB = self.MSE_loss(real_GB_cam_logit, torch.ones_like(real_GB_cam_logit).cuda()) + \
-                               self.MSE_loss(fake_GB_cam_logit, torch.zeros_like(fake_GB_cam_logit).cuda())
+            D_ad_cam_loss_GB = self.MSE_loss(real_GB_cam_logit, torch.ones_like(real_GB_cam_logit).to(self.device)) + \
+                               self.MSE_loss(fake_GB_cam_logit, torch.zeros_like(fake_GB_cam_logit).to(self.device))
 
-            D_ad_loss_LB = self.MSE_loss(real_LB_logit, torch.ones_like(real_LB_logit).cuda()) + \
-                           self.MSE_loss(fake_LB_logit, torch.zeros_like(fake_LB_logit).cuda())
+            D_ad_loss_LB = self.MSE_loss(real_LB_logit, torch.ones_like(real_LB_logit).to(self.device)) + \
+                           self.MSE_loss(fake_LB_logit, torch.zeros_like(fake_LB_logit).to(self.device))
 
-            D_ad_cam_loss_LB = self.MSE_loss(real_LB_cam_logit, torch.ones_like(real_LB_cam_logit).cuda()) +\
-                               self.MSE_loss(fake_LB_cam_logit, torch.zeros_like(fake_LB_cam_logit).cuda())
+            D_ad_cam_loss_LB = self.MSE_loss(real_LB_cam_logit, torch.ones_like(real_LB_cam_logit).to(self.device)) +\
+                               self.MSE_loss(fake_LB_cam_logit, torch.zeros_like(fake_LB_cam_logit).to(self.device))
 
             D_loss_A = self.adv_weight * (D_ad_loss_GA + D_ad_cam_loss_GA + D_ad_loss_LA + D_ad_cam_loss_LA)
             D_loss_B = self.adv_weight * (D_ad_loss_GB + D_ad_cam_loss_GB + D_ad_loss_LB + D_ad_cam_loss_LB)
@@ -270,14 +270,14 @@ class UgatitSadalinHourglass(object):
             fake_GB_logit, fake_GB_cam_logit, _ = self.disGB(fake_A2B)
             fake_LB_logit, fake_LB_cam_logit, _ = self.disLB(fake_A2B)
 
-            G_ad_loss_GA = self.MSE_loss(fake_GA_logit, torch.ones_like(fake_GA_logit).cuda())
-            G_ad_cam_loss_GA = self.MSE_loss(fake_GA_cam_logit, torch.ones_like(fake_GA_cam_logit).cuda())
-            G_ad_loss_LA = self.MSE_loss(fake_LA_logit, torch.ones_like(fake_LA_logit).cuda())
-            G_ad_cam_loss_LA = self.MSE_loss(fake_LA_cam_logit, torch.ones_like(fake_LA_cam_logit).cuda())
-            G_ad_loss_GB = self.MSE_loss(fake_GB_logit, torch.ones_like(fake_GB_logit).cuda())
-            G_ad_cam_loss_GB = self.MSE_loss(fake_GB_cam_logit, torch.ones_like(fake_GB_cam_logit).cuda())
-            G_ad_loss_LB = self.MSE_loss(fake_LB_logit, torch.ones_like(fake_LB_logit).cuda())
-            G_ad_cam_loss_LB = self.MSE_loss(fake_LB_cam_logit, torch.ones_like(fake_LB_cam_logit).cuda())
+            G_ad_loss_GA = self.MSE_loss(fake_GA_logit, torch.ones_like(fake_GA_logit).to(self.device))
+            G_ad_cam_loss_GA = self.MSE_loss(fake_GA_cam_logit, torch.ones_like(fake_GA_cam_logit).to(self.device))
+            G_ad_loss_LA = self.MSE_loss(fake_LA_logit, torch.ones_like(fake_LA_logit).to(self.device))
+            G_ad_cam_loss_LA = self.MSE_loss(fake_LA_cam_logit, torch.ones_like(fake_LA_cam_logit).to(self.device))
+            G_ad_loss_GB = self.MSE_loss(fake_GB_logit, torch.ones_like(fake_GB_logit).to(self.device))
+            G_ad_cam_loss_GB = self.MSE_loss(fake_GB_cam_logit, torch.ones_like(fake_GB_cam_logit).to(self.device))
+            G_ad_loss_LB = self.MSE_loss(fake_LB_logit, torch.ones_like(fake_LB_logit).to(self.device))
+            G_ad_cam_loss_LB = self.MSE_loss(fake_LB_cam_logit, torch.ones_like(fake_LB_cam_logit).to(self.device))
 
             G_recon_loss_A = self.L1_loss(fake_A2B2A, real_A)
             G_recon_loss_B = self.L1_loss(fake_B2A2B, real_B)
@@ -288,10 +288,10 @@ class UgatitSadalinHourglass(object):
             G_id_loss_A = self.facenet.cosine_distance(real_A, fake_A2B)
             G_id_loss_B = self.facenet.cosine_distance(real_B, fake_B2A)
 
-            G_cam_loss_A = self.BCE_loss(fake_B2A_cam_logit, torch.ones_like(fake_B2A_cam_logit).cuda()) + \
-                           self.BCE_loss(fake_A2A_cam_logit, torch.zeros_like(fake_A2A_cam_logit).cuda())
-            G_cam_loss_B = self.BCE_loss(fake_A2B_cam_logit, torch.ones_like(fake_A2B_cam_logit).cuda()) + \
-                           self.BCE_loss(fake_B2B_cam_logit, torch.zeros_like(fake_B2B_cam_logit).cuda())
+            G_cam_loss_A = self.BCE_loss(fake_B2A_cam_logit, torch.ones_like(fake_B2A_cam_logit).to(self.device)) + \
+                           self.BCE_loss(fake_A2A_cam_logit, torch.zeros_like(fake_A2A_cam_logit).to(self.device))
+            G_cam_loss_B = self.BCE_loss(fake_A2B_cam_logit, torch.ones_like(fake_A2B_cam_logit).to(self.device)) + \
+                           self.BCE_loss(fake_B2B_cam_logit, torch.zeros_like(fake_B2B_cam_logit).to(self.device))
 
             G_loss_A = self.adv_weight * (G_ad_loss_GA + G_ad_cam_loss_GA + G_ad_loss_LA + G_ad_cam_loss_LA) + \
                        self.cycle_weight * G_recon_loss_A + self.identity_weight * G_identity_loss_A + \
@@ -333,7 +333,7 @@ class UgatitSadalinHourglass(object):
                         except:
                             trainB_iter = iter(self.trainB_loader)
                             real_B, _ = trainB_iter.next()
-                        real_A, real_B = real_A.cuda(), real_B.cuda()
+                        real_A, real_B = real_A.to(self.device), real_B.to(self.device)
 
                         fake_A2B, _, fake_A2B_heatmap = self.genA2B(real_A)
                         fake_B2A, _, fake_B2A_heatmap = self.genB2A(real_B)
@@ -372,7 +372,7 @@ class UgatitSadalinHourglass(object):
                         except:
                             testB_iter = iter(self.testB_loader)
                             real_B, _ = testB_iter.next()
-                        real_A, real_B = real_A.cuda(), real_B.cuda()
+                        real_A, real_B = real_A.to(self.device), real_B.to(self.device)
 
                         fake_A2B, _, fake_A2B_heatmap = self.genA2B(real_A)
                         fake_B2A, _, fake_B2A_heatmap = self.genB2A(real_B)
@@ -449,7 +449,7 @@ class UgatitSadalinHourglass(object):
         self.genA2B.eval(), self.genB2A.eval()
         with torch.no_grad():
             for n, (real_A, _) in enumerate(self.testA_loader):
-                real_A = real_A.cuda()
+                real_A = real_A.to(self.device)
 
                 fake_A2B, _, fake_A2B_heatmap = self.genA2B(real_A)
 
@@ -468,7 +468,7 @@ class UgatitSadalinHourglass(object):
                 cv2.imwrite(os.path.join(self.result_dir, self.dataset, 'test', 'A2B_%d.png' % (n + 1)), A2B * 255.0)
 
             for n, (real_B, _) in enumerate(self.testB_loader):
-                real_B = real_B.cuda()
+                real_B = real_B.to(self.device)
 
                 fake_B2A, _, fake_B2A_heatmap = self.genB2A(real_B)
 
