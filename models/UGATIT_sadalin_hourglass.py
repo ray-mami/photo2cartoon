@@ -287,6 +287,9 @@ class UgatitSadalinHourglass(object):
 
             G_id_loss_A = self.facenet.cosine_distance(real_A, fake_A2B)
             G_id_loss_B = self.facenet.cosine_distance(real_B, fake_B2A)
+            G_id_loss_A = torch.mean(G_id_loss_A)
+            G_id_loss_B = torch.mean(G_id_loss_B)
+
 
             G_cam_loss_A = self.BCE_loss(fake_B2A_cam_logit, torch.ones_like(fake_B2A_cam_logit).to(self.device)) + \
                            self.BCE_loss(fake_A2A_cam_logit, torch.zeros_like(fake_A2A_cam_logit).to(self.device))
@@ -408,22 +411,36 @@ class UgatitSadalinHourglass(object):
 
             if step % 1000 == 0:
                 params = {}
-                params['genA2B'] = self.genA2B.state_dict()
-                params['genB2A'] = self.genB2A.state_dict()
-                params['disGA'] = self.disGA.state_dict()
-                params['disGB'] = self.disGB.state_dict()
-                params['disLA'] = self.disLA.state_dict()
-                params['disLB'] = self.disLB.state_dict()
+                params['genA2B'] = self.genA2B.module.state_dict()
+                params['genB2A'] = self.genB2A.module.state_dict()
+                params['disGA'] = self.disGA.module.state_dict()
+                params['disGB'] = self.disGB.module.state_dict()
+                params['disLA'] = self.disLA.module.state_dict()
+                params['disLB'] = self.disLB.module.state_dict() 
+                #params = {}
+                #params['genA2B'] = self.genA2B.state_dict()
+                #params['genB2A'] = self.genB2A.state_dict()
+                #params['disGA'] = self.disGA.state_dict()
+                #params['disGB'] = self.disGB.state_dict()
+                #params['disLA'] = self.disLA.state_dict()
+                #params['disLB'] = self.disLB.state_dict()
                 torch.save(params, os.path.join(self.result_dir, self.dataset + '_params_latest.pt'))
 
     def save(self, dir, step):
         params = {}
-        params['genA2B'] = self.genA2B.state_dict()
-        params['genB2A'] = self.genB2A.state_dict()
-        params['disGA'] = self.disGA.state_dict()
-        params['disGB'] = self.disGB.state_dict()
-        params['disLA'] = self.disLA.state_dict()
-        params['disLB'] = self.disLB.state_dict()
+        params['genA2B'] = self.genA2B.module.state_dict()
+        params['genB2A'] = self.genB2A.module.state_dict()
+        params['disGA'] = self.disGA.module.state_dict()
+        params['disGB'] = self.disGB.module.state_dict()
+        params['disLA'] = self.disLA.module.state_dict()
+        params['disLB'] = self.disLB.module.state_dict()   
+        
+        #params['genA2B'] = self.genA2B.state_dict()
+        #params['genB2A'] = self.genB2A.state_dict()
+        #params['disGA'] = self.disGA.state_dict()
+        #params['disGB'] = self.disGB.state_dict()
+        #params['disLA'] = self.disLA.state_dict()
+        #params['disLB'] = self.disLB.state_dict()
         torch.save(params, os.path.join(dir, self.dataset + '_params_%07d.pt' % step))
 
     def load(self, dir, step):
